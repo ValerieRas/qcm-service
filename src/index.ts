@@ -12,7 +12,7 @@ app.use('/health', healthRouter)
 
 
 app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Express Cinema API' })
+  res.json({ message: 'Welcome to QCM API' })
 })
 
 

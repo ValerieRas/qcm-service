@@ -10,31 +10,31 @@ datasource db {
 model Propositions {
   id          Int     @id @default(autoincrement())
   proposition String?
-  id_question String
+  id_question Int
 }
 
 model QCMs {
   id            Int       @id(map: "QCM_pkey") @default(autoincrement())
   description   String?
-  id_question_1 String
-  id_question_2 String
-  id_question_3 String
-  id_question_4 String?
+  id_question_1 Int
+  id_question_2 Int
+  id_question_3 Int
+  id_question_4 Int?
   created_at    DateTime? @db.Date
-  deleted_at    String?
+  deleted_at    DateTime? @db.Date
 }
 
 model Questions {
   id             Int     @id @default(autoincrement())
   question       String?
-  id_proposition Int?
+  id_proposition Int
 }
 
 model Responses {
-  id             Int    @id @default(autoincrement())
-  id_User        String
-  id_question    String
-  id_proposition String
+  id             Int @id @default(autoincrement())
+  id_User        Int
+  id_question    Int
+  id_proposition Int
 }
 
 model Users {

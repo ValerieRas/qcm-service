@@ -1,4 +1,9 @@
 BASE_URL=http://localhost:3001
 
+### GET health check
+GET {BASE_URL}/health
+
+
+
 ### GET all QCMs
-GET {BASE_URL}/qcms/
+GET {BASE_URL}/qcms

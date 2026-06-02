@@ -65,11 +65,10 @@ router.get('/:id/result', async (req, res) => {
 
       const totalQuestions = question_1.length + question_2.length + question_3.length + question_4.length
       
-      const questionIds = [...question_1, ...question_2, ...question_3, ...question_4].map((q: { id: number }) => q.id.toString())
+      const questionIds = [...question_1, ...question_2, ...question_3, ...question_4].map((q: { id: number }) => q.id)
       const propositionIds = [...question_1, ...question_2, ...question_3, ...question_4]
         .map((q: { id_proposition: number | null }) => q.id_proposition)
         .filter((pid): pid is number => pid !== null && pid !== undefined)
-        .map(pid => pid.toString())
       
       const responses = await prisma.responses.findMany({
         where: {
@@ -108,7 +107,7 @@ router.get('/:id/question', async (req, res) => {
         const question = await prisma.questions.findUnique({ where: { id: Number(questionId) } })
         if (!question) continue
 
-        const existingResponse = await prisma.responses.findFirst({ where: { id_question: String(questionId) } })
+        const existingResponse = await prisma.responses.findFirst({ where: { id_question: Number(questionId) } })
 
         if (!existingResponse) {
           return res.status(200).json(question)
