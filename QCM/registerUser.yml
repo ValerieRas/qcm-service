@@ -1,0 +1,22 @@
+info:
+  name: registerUser
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:3001/local/register
+  body:
+    type: json
+    data: |-
+      {
+        "user_name":"val",
+        "mdp":"val"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

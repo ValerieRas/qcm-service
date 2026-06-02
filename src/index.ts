@@ -2,6 +2,7 @@ import 'dotenv/config'
 import express from 'express'
 import qcmRouter from './routes/qcm.js'
 import healthRouter from './routes/health.js'
+import authRouter from './routes/auth.js'
 
 
 const app = express()
@@ -9,6 +10,8 @@ const app = express()
 app.use(express.json())
 app.use('/qcms', qcmRouter)
 app.use('/health', healthRouter)
+app.use('/auth', authRouter)
+
 
 
 app.get('/', (req, res) => {

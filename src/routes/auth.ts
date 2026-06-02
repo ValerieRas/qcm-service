@@ -4,10 +4,10 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
 
-const router = Router()
+const authRouter = Router()
 
 //Authentification d'un utilisateur
-router.post("/local/register", async (req, res) => {
+authRouter.post("/local/register", async (req, res) => {
 
     const { mdp, user_name } = req.body;
     const userWithuserName = await prisma.users.findFirst({ where: { user_name } });
@@ -16,6 +16,7 @@ router.post("/local/register", async (req, res) => {
     }
 
     const hashedmdp = await bcrypt.hash(mdp, parseInt(process.env.SALT_ROUNDS!));
+
     const newUser = await prisma.users.create({
         data: {
             mdp: hashedmdp,
@@ -27,7 +28,7 @@ router.post("/local/register", async (req, res) => {
     res.status(201).json(newUser);
 });
 
-router.post("/local", async (req, res) => {
+authRouter.post("/local", async (req, res) => {
     const { user_name, mdp } = req.body;
     const userWithuserName = await prisma.users.findFirst({ where: { user_name } });
     if (!userWithuserName || !userWithuserName.mdp) {
@@ -35,6 +36,7 @@ router.post("/local", async (req, res) => {
     }
     else {
         const ismdpCorrect = await bcrypt.compare(mdp, userWithuserName.mdp );
+        
         if (ismdpCorrect) {
             const token = jwt.sign(userWithuserName, process.env.JWT_SECRET!);
             res.json({
@@ -47,3 +49,5 @@ router.post("/local", async (req, res) => {
         }
     }
 })
+
+export default authRouter

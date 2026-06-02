@@ -1,0 +1,21 @@
+info:
+  name: postReponse
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:3001/4/reponse
+  body:
+    type: json
+    data: |-
+      {
+        
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

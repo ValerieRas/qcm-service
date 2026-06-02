@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import prisma from '../lib/prisma.js'
+import { authenticateToken } from '../middleware/checkAuth.js';
 
 const router = Router()
 
@@ -212,13 +213,12 @@ router.get('/:id/result', async (req, res) => {
 })
 
 //Post une réponse à une question d'un qcm
-router.post('/:id/reponse', async (req, res) => {
+router.post('/:id/reponse', authenticateToken, async (req, res) => {
   const { id } = req.params
   const { id_question, id_proposition } = req.body
-
-  
-  //A récupérer avec Middleware d'authentification 
-  const idUser = req.body.id_user
+   
+  const user = (req as any).user
+  const idUser = user.id
   try {
 
     const response = await prisma.responses.create({
