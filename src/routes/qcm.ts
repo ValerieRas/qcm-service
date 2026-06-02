@@ -160,8 +160,11 @@ router.delete('/:id', async (req, res) => {
 })
 
 // Get le résultat d'un QCM (score) 
-router.get('/:id/result', async (req, res) => {
+router.get('/:id/result', authenticateToken, async (req, res) => {
   const { id } = req.params
+
+  const user = (req as any).user
+  const idUser = user.id
   
   try {
     
@@ -173,42 +176,28 @@ router.get('/:id/result', async (req, res) => {
       return res.status(404).json({ message: "QCM  not found" })
     }else{
 
-      const question_1 = await prisma.questions.findMany({
-        where: { id: Number(qcm.id_question_1) }
-      })  
-
-      const question_2 = await prisma.questions.findMany({
-        where: { id: Number(qcm.id_question_2) }
-      })  
-
-      const question_3 = await prisma.questions.findMany({
-        where: { id: Number(qcm.id_question_3) }
-      })  
-
-      const question_4= await prisma.questions.findMany({
-        where: { id: Number(qcm.id_question_4) }
-      })  
-
-      const totalQuestions = question_1.length + question_2.length + question_3.length + question_4.length
-      
-      const questionIds = [...question_1, ...question_2, ...question_3, ...question_4].map((q: { id: number }) => q.id)
-      const propositionIds = [...question_1, ...question_2, ...question_3, ...question_4]
-        .map((q: { id_proposition: number | null }) => q.id_proposition)
-        .filter((pid): pid is number => pid !== null && pid !== undefined)
-      
-      const responses = await prisma.responses.findMany({
+      const questionIds = [qcm.id_question_1, qcm.id_question_2, qcm.id_question_3, qcm.id_question_4].filter((id): id is number => id != null)
+      const questions = await prisma.questions.findMany({
         where: {
-          id_proposition: { in: propositionIds },
-          id_question: { in: questionIds },
-          id_user: Number(req.query.id_user)
+          id: { in: questionIds }
         }
       })
+      const totalQuestions = questions.length
 
-      return res.status(200).json({responsesCount: responses.length , totalQuestions });
+      const responses = await prisma.responses.findMany({
+        where: {
+          id_User: idUser,
+          id_question: { in: questions.map(q => q.id),
+          id_proposition: { in: questions.map(q => q.id_proposition) } }
+           }
+        })
+
+
+      return res.status(200).json({result: responses.length , nbQuestion: totalQuestions });
     }
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Internal Server Error' })
+    res.status(500).json({ error: 'Erreur lors du calcul du résultat par le serveur' })
   }
 })
 
@@ -216,7 +205,7 @@ router.get('/:id/result', async (req, res) => {
 router.post('/:id/reponse', authenticateToken, async (req, res) => {
   const { id } = req.params
   const { id_question, id_proposition } = req.body
-   
+
   const user = (req as any).user
   const idUser = user.id
   try {
