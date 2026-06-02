@@ -65,9 +65,16 @@ router.get('/:id/result', async (req, res) => {
 
       const totalQuestions = question_1.length + question_2.length + question_3.length + question_4.length
       
+      const questionIds = [...question_1, ...question_2, ...question_3, ...question_4].map((q: { id: number }) => q.id)
+      const propositionIds = [...question_1, ...question_2, ...question_3, ...question_4].map((q: { id_proposition: number }) => q.id_proposition)
+      
       const responses = await prisma.response.findMany({
-        where: { id_proposition: { in: [...question_1, ...question_2, ...question_3, ...question_4].map((q: { id_proposition: number }) => q.id_proposition) } }
-      }) 
+        where: {
+          id_proposition: { in: propositionIds },
+          id_question: { in: questionIds },
+          id_user: Number(req.query.id_user)
+        }
+      })
 
       return res.status(200).json({responsesCount: responses.length , totalQuestions });
     }
