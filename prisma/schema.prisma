@@ -8,26 +8,36 @@ datasource db {
 }
 
 model Propositions {
-  id          Int     @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   proposition String?
   id_question Int
+  Questions   Questions @relation(fields: [id_question], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_propositions_questions")
 }
 
 model QCMs {
-  id            Int       @id(map: "QCM_pkey") @default(autoincrement())
-  description   String?
-  id_question_1 Int
-  id_question_2 Int
-  id_question_3 Int
-  id_question_4 Int?
-  created_at    DateTime? @db.Date
-  deleted_at    DateTime? @db.Date
+  id                                      Int        @id(map: "QCM_pkey") @default(autoincrement())
+  description                             String?
+  id_question_1                           Int
+  id_question_2                           Int
+  id_question_3                           Int
+  id_question_4                           Int?
+  created_at                              DateTime?  @db.Date
+  deleted_at                              DateTime?  @db.Date
+  Questions_QCMs_id_question_1ToQuestions Questions  @relation("QCMs_id_question_1ToQuestions", fields: [id_question_1], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_qcm_q1")
+  Questions_QCMs_id_question_2ToQuestions Questions  @relation("QCMs_id_question_2ToQuestions", fields: [id_question_2], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_qcm_q2")
+  Questions_QCMs_id_question_3ToQuestions Questions  @relation("QCMs_id_question_3ToQuestions", fields: [id_question_3], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_qcm_q3")
+  Questions_QCMs_id_question_4ToQuestions Questions? @relation("QCMs_id_question_4ToQuestions", fields: [id_question_4], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_qcm_q4")
 }
 
 model Questions {
-  id             Int     @id @default(autoincrement())
-  question       String?
-  id_proposition Int
+  id                                 Int            @id @default(autoincrement())
+  question                           String?
+  id_proposition                     Int
+  Propositions                       Propositions[]
+  QCMs_QCMs_id_question_1ToQuestions QCMs[]         @relation("QCMs_id_question_1ToQuestions")
+  QCMs_QCMs_id_question_2ToQuestions QCMs[]         @relation("QCMs_id_question_2ToQuestions")
+  QCMs_QCMs_id_question_3ToQuestions QCMs[]         @relation("QCMs_id_question_3ToQuestions")
+  QCMs_QCMs_id_question_4ToQuestions QCMs[]         @relation("QCMs_id_question_4ToQuestions")
 }
 
 model Responses {
@@ -39,7 +49,8 @@ model Responses {
 
 model Users {
   id         Int     @id @default(autoincrement())
-  name       String? @db.VarChar
+  user_name  String? @unique @db.VarChar
   created_at String
   deleted_at String?
+  mdp        String? @db.VarChar
 }
