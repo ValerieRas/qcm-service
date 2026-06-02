@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Propositions {
+  id          Int     @id @default(autoincrement())
+  proposition String?
+  id_question String
+}
+
+model QCMs {
+  id            Int       @id(map: "QCM_pkey") @default(autoincrement())
+  description   String?
+  id_question_1 String
+  id_question_2 String
+  id_question_3 String
+  id_question_4 String?
+  created_at    DateTime? @db.Date
+  deleted_at    String?
+}
+
+model Questions {
+  id             Int     @id @default(autoincrement())
+  question       String?
+  id_proposition Int?
+}
+
+model Responses {
+  id             Int    @id @default(autoincrement())
+  id_User        String
+  id_question    String
+  id_proposition String
+}
+
+model Users {
+  id         Int     @id @default(autoincrement())
+  name       String? @db.VarChar
+  created_at String
+  deleted_at String?
+}
