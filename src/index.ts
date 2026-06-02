@@ -13,7 +13,6 @@ app.use('/health', healthRouter)
 app.use('/auth', authRouter)
 
 
-
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to QCM API' })
 })

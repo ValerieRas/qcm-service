@@ -5,14 +5,17 @@ info:
 
 http:
   method: POST
-  url: http://localhost:3001/4/reponse
+  url: http://localhost:3001/qcms/4/reponse
   body:
     type: json
     data: |-
       {
-        
+        "id_question":16,
+        "id_proposition":64
       }
-  auth: inherit
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcl9uYW1lIjoidmFsIiwiY3JlYXRlZF9hdCI6IjIwMjYtMDYtMDJUMTM6NDQ6NDMuODMxWiIsImRlbGV0ZWRfYXQiOm51bGwsImlhdCI6MTc4MDQwODUzOX0.qgoXSE7Q8Q4AAd11CLaa5tdlehuyvtbRrnEn9eGwvUs
 
 settings:
   encodeUrl: true

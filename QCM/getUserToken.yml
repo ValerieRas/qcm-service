@@ -1,11 +1,11 @@
 info:
-  name: registerUser
+  name: getUserToken
   type: http
   seq: 1
 
 http:
   method: POST
-  url: http://localhost:3001/auth/local/register
+  url: http://localhost:3001/auth/local/
   body:
     type: json
     data: |-
