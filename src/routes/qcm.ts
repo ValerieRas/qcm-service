@@ -20,8 +20,7 @@ router.get('/', async (req, res) => {
 
 // Get a qcm by ID
 router.get('/:id', async (req, res) => {
-  const { id } = req.params
-  
+  const { id } = req.params 
   try {
     const qcm = await prisma.qcm.findUnique({
       where: { id: Number(id) }
@@ -35,7 +34,6 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' })
   }
 })
-
 
 // Get le résultat d'un QCM (score) 
 router.get('/:id/result', async (req, res) => {
@@ -47,42 +45,119 @@ router.get('/:id/result', async (req, res) => {
     })
     if (!qcm) {
       return res.status(404).json({ message: "QCM  not found" })
+    }else{
+
+      const question_1 = await prisma.question.findMany({
+        where: { id: Number(qcm.id_question_1) }
+      })  
+
+      const question_2 = await prisma.question.findMany({
+        where: { id: Number(qcm.id_question_2) }
+      })  
+
+      const question_3 = await prisma.question.findMany({
+        where: { id: Number(qcm.id_question_3) }
+      })  
+
+      const question_4= await prisma.question.findMany({
+        where: { id: Number(qcm.id_question_4) }
+      })  
+
+      const totalQuestions = question_1.length + question_2.length + question_3.length + question_4.length
+      
+      const responses = await prisma.response.findMany({
+        where: { id_proposition: { in: [...question_1, ...question_2, ...question_3, ...question_4].map((q: { id_proposition: number }) => q.id_proposition) } }
+      }) 
+
+      return res.status(200).json({responsesCount: responses.length , totalQuestions });
     }
-    res.json(qcm)
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Internal Server Error' })
   }
 })
 
-// Update a qcm   
-router.put('/:id', async (req, res) => {
+
+// Get la prochaine d'un qcm (pas encore répondue)
+router.get('/:id/question', async (req, res) => {
   const { id } = req.params
-  const { title, description, releaseDate } = req.body
+  
   try {
-    const movie = await prisma.movie.update({
-      where: { id: Number(id) },
-      data: { title, description, releaseDate }
+    const qcm = await prisma.qcm.findUnique({
+      where: { id: Number(id) }
     })
-    res.json(movie)
+    if (!qcm) {
+      return res.status(404).json({ message: "QCM  not found" })
+    }else{
+
+      for (let i = 1; i <= 4; i++) {
+
+        const questionId = (qcm as any)[`id_question_${i}`]
+        if (!questionId) continue
+
+        const question = await prisma.question.findUnique({ where: { id: Number(questionId) } })
+        if (!question) continue
+
+        const existingResponse = await prisma.response.findFirst({ where: { id_question: Number(questionId) } })
+
+        if (!existingResponse) {
+          return res.status(200).json(question)
+        }
+      }
+
+      return res.status(404).json({ message: 'No next question found' })
+
+    }
+
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
+})
+
+
+// Create a qcm
+router.post('/', async (req, res) => {
+  const { description, id_question_1, id_question_2, id_question_3, id_question_4 } = req.body
+  try {
+    const qcm = await prisma.qcm.create({
+      data: { description, id_question_1, id_question_2, id_question_3, id_question_4 }
+    })
+    res.status(201).json(qcm)
   } catch (error) {
     console.error(error)
     res.status(400).json({ error: 'Bad Request' })
   }
 })
 
-// Delete a movie
+// Delete a qcm by ID 
 router.delete('/:id', async (req, res) => {
   const { id } = req.params
   try {
-    await prisma.movie.delete({
+    await prisma.qcm.delete({
       where: { id: Number(id) }
     })
-    res.json({ message: "Movie deleted successfully" })
+    res.json({ message: "QCM deleted successfully" })
   } catch (error) {
     console.error(error)
     res.status(400).json({ error: 'Bad Request' })
   }
 })
+
+
+//Post une réponse à une question d'un qcm
+router.post('/:id/response', async (req, res) => {
+  const { id } = req.params
+  const { id_question, id_proposition, id_user} = req.body
+  try {
+    const response = await prisma.response.create({
+      data: { id_question, id_proposition, id_user }
+    })
+    res.status(201).json(response)
+  } catch (error) {
+    console.error(error)
+    res.status(400).json({ error: 'Bad Request' })
+  }
+})  
 
 export default router
