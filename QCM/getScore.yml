@@ -1,0 +1,14 @@
+info:
+  name: getScore
+  type: http
+
+http:
+  method: GET
+  url: http://localhost:3001/2/result
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -127,17 +127,75 @@ router.get('/:id/question', async (req, res) => {
 
 // Create a qcm
 router.post('/', async (req, res) => {
-  const { description, id_question_1, id_question_2, id_question_3, id_question_4 } = req.body
-  try {
-    const qcm = await prisma.qCMs.create({
-      data: { description, id_question_1, id_question_2, id_question_3, id_question_4 }
-    })
-    res.status(201).json(qcm)
-  } catch (error) {
-    console.error(error)
-    res.status(400).json({ error: 'Bad Request' })
+  const { description, questions } = req.body;
+
+  // Validation 3 ou 4 questions
+  if (!questions || questions.length < 3 || questions.length > 4) {
+    return res.status(400).json({ error: "A QCM must have either 3 or 4 questions." });
   }
-})
+
+  try {
+    
+    const result = await prisma.$transaction(async (tx) => {
+      const createdQuestionIds = [];
+
+      for (const q of questions) {
+        
+        //Créer les questions
+        const newQuestion = await tx.questions.create({
+          data: {
+            question: q.question,
+            id_proposition: 0 // Temporary placeholder
+          }
+        });
+
+        //Créer les propositions pour chaque question
+        const propositionRecords = [];
+        for (const propText of q.propositions) {
+          const newProp = await tx.propositions.create({
+            data: {
+              proposition: propText,
+              id_question: newQuestion.id 
+            }
+          });
+          propositionRecords.push(newProp);
+        }
+
+        // Trouver la proposition correcte basée sur l'index fourni
+        const correctProposition = propositionRecords[q.correctAnswerIndex];
+
+        // Update les questions avec la bonne proposition correcte
+        await tx.questions.update({
+          where: { id: newQuestion.id },
+          data: { id_proposition: correctProposition.id }
+        });
+
+        //Liste des questions créées pour le mapping final du QCM
+        createdQuestionIds.push(newQuestion.id);
+      }
+
+      // Créer le QCM avec les IDs des questions créées
+      const qcm = await tx.qCMs.create({
+        data: {
+          description,
+          id_question_1: createdQuestionIds[0],
+          id_question_2: createdQuestionIds[1],
+          id_question_3: createdQuestionIds[2],
+          id_question_4: createdQuestionIds[3] || null,
+          created_at: new Date()
+        }
+      });
+
+      return qcm;
+    });
+
+    res.status(201).json(result);
+
+  } catch (error) {
+    console.error("Transaction Error: ", error);
+    res.status(500).json({ error: 'Failed to create QCM completely. Changes rolled back.' });
+  }
+});
 
 // Delete a qcm by ID 
 router.delete('/:id', async (req, res) => {

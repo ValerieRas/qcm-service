@@ -10,7 +10,49 @@ http:
     type: json
     data: |-
       {
-        
+        "description": "Fascinating Chicken Facts Quiz",
+        "questions": [
+          {
+            "question": "Which living dinosaur group are chickens most closely related to?",
+            "correctAnswerIndex": 0,
+            "propositions": [
+              "Tyrannosaurus Rex",
+              "Triceratops",
+              "Pterodactyl",
+              "Velociraptor"
+            ]
+          },
+          {
+            "question": "Approximately how many distinct vocalizations do chickens use to communicate?",
+            "correctAnswerIndex": 2,
+            "propositions": [
+              "Only 2 (cluck and crow)",
+              "Around 5",
+              "More than 30",
+              "Over 100"
+            ]
+          },
+          {
+            "question": "What determines the color of a chicken's eggshell?",
+            "correctAnswerIndex": 1,
+            "propositions": [
+              "The type of food they eat",
+              "The chicken's breed and genetics",
+              "The amount of sunlight they receive",
+              "The age of the hen"
+            ]
+          },
+          {
+            "question": "How do chickens take a 'bath' to keep their feathers clean and pest-free?",
+            "correctAnswerIndex": 3,
+            "propositions": [
+              "By splashing in puddles",
+              "By rubbing against tree bark",
+              "Hens clean each other like primates",
+              "By rolling around in loose dirt or dust"
+            ]
+          }
+        ]
       }
   auth: inherit
 
