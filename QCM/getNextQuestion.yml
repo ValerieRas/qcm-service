@@ -1,10 +1,11 @@
 info:
   name: getNextQuestion
   type: http
+  seq: 1
 
 http:
   method: GET
-  url: http://localhost:3001/2/question
+  url: http://localhost:3001/qcms/2/question
   auth: inherit
 
 settings:
