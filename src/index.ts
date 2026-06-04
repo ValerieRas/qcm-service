@@ -10,7 +10,6 @@ const app = express()
 app.use(express.json())
 app.use('/qcms', qcmRouter)
 app.use('/health', healthRouter)
-app.use('/auth', authRouter)
 
 
 app.get('/', (req, res) => {

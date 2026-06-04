@@ -160,11 +160,10 @@ router.delete('/:id', async (req, res) => {
 })
 
 // Get le résultat d'un QCM (score) 
-router.get('/:id/result', authenticateToken, async (req, res) => {
+router.get('/:id/result', async (req, res) => {
   const { id } = req.params
 
-  const user = (req as any).user
-  const idUser = user.id
+  const idUser = (req as any).userID
   
   try {
     
@@ -202,12 +201,10 @@ router.get('/:id/result', authenticateToken, async (req, res) => {
 })
 
 //Post une réponse à une question d'un qcm
-router.post('/:id/reponse', authenticateToken, async (req, res) => {
+router.post('/:id/reponse', async (req, res) => {
   const { id } = req.params
   const { id_question, id_proposition } = req.body
-
-  const user = (req as any).user
-  const idUser = user.id
+  const idUser = (req as any).userID
   try {
 
     const response = await prisma.responses.create({
